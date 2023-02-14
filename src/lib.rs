@@ -1,15 +1,16 @@
 use rand::{thread_rng, Rng};
 use std::fs;
 
-const NAMES: String = include!("./names.txt");
-
+#[derive(Debug, Clone)]
 pub struct NameGen {
     names: Vec<String>,
 }
 
+const NAMES: &str = include_str!("./names.txt");
+
 impl NameGen {
     pub fn new() -> NameGen {
-        let data = fs::read_to_string("./names.txt").unwrap().replace("\r", "");
+        let data = NAMES.replace("\r", "");
         let names: Vec<String> = data.split("\n").map(String::from).collect();
 
         NameGen { names }
