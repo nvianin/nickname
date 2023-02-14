@@ -1,6 +1,8 @@
 use rand::{thread_rng, Rng};
 use std::fs;
 
+const NAMES: String = include!("./names.txt");
+
 pub struct NameGen {
     names: Vec<String>,
 }
@@ -13,7 +15,7 @@ impl NameGen {
         NameGen { names }
     }
 
-    pub fn name(&mut self) -> String {
+    pub fn name(&self) -> String {
         let i = thread_rng().gen_range(0..self.names.len());
         let mut name: String;
         if self.names[i].chars().nth(0).unwrap() != '/' {
@@ -27,7 +29,7 @@ impl NameGen {
         name
     }
 
-    fn random_chars(&mut self, number: usize) -> String {
+    fn random_chars(&self, number: usize) -> String {
         thread_rng()
             .sample_iter(&rand::distributions::Alphanumeric)
             .take(number)
