@@ -19,10 +19,17 @@ impl NameGen {
     pub fn name(&self) -> String {
         let i = thread_rng().gen_range(0..self.names.len());
         let mut name: String;
-        if self.names[i].chars().nth(0).unwrap() != '/' {
-            name = self.names[i].clone();
-        } else {
-            name = self.name();
+        match self.names[i].chars().nth(0) {
+            Some(char) => {
+                if char != '/' {
+                    name = self.names[i].clone();
+                } else {
+                    name = self.name();
+                }
+            }
+            None => {
+                name = self.name();
+            }
         }
 
         name += &(String::from("-") + &self.random_chars(3));
