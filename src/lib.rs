@@ -55,7 +55,8 @@ pub fn test() {
     let mut names = HashMap::new();
     for _ in 0..1000000000 {
         let name = namer.name();
-        println!("{}", name);
+        let surname = namer.name();
+        println!("{} {}", name, surname);
         names.insert(name, 1);
     }
 }
