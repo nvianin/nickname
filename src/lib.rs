@@ -46,10 +46,15 @@ impl NameGen {
     }
 }
 
+use std::collections::HashMap;
+
 #[test]
 pub fn test() {
     let mut namer = NameGen::new();
-    for _ in 0..100 {
-        println!("{}", namer.name());
+    let mut names = HashMap::new();
+    for _ in 0..1000000000 {
+        let name = namer.name();
+        println!("{}", name);
+        names.insert(name, 1);
     }
 }
