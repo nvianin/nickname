@@ -1,7 +1,8 @@
 use rand::{thread_rng, Rng};
+use serde::{Deserialize, Serialize};
 use std::fs;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct NameGen {
     names: Vec<String>,
 }
