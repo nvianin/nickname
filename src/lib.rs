@@ -1,3 +1,4 @@
+use core::panic;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -51,11 +52,14 @@ use std::collections::HashMap;
 
 #[test]
 pub fn test() {
-    let mut namer = NameGen::new();
+    let namer = NameGen::new();
     let mut names = HashMap::new();
-    for _ in 0..1000000000 {
+    for n in 0..100_000_000 {
         let name = namer.name();
         println!("{}", name);
-        names.insert(name, 1);
+        if let Some(_) = names.insert(name.clone(), 1) {
+            println!("Fail after {n} inserts, {} already exists", name);
+            names.insert(name.clone(), names.get(&name).unwrap() + 1);
+        }
     }
 }
