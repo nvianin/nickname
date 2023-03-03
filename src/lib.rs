@@ -56,7 +56,8 @@ pub fn test() {
     let mut names = HashMap::new();
     for n in 0..100_000_000 {
         let name = namer.name();
-        println!("{}", name);
+        let surname = namer.name();
+        println!("{} {}", name, surname);
         if let Some(_) = names.insert(name.clone(), 1) {
             println!("Fail after {n} inserts, {} already exists", name);
             names.insert(name.clone(), names.get(&name).unwrap() + 1);
