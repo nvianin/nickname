@@ -54,13 +54,19 @@ use std::collections::HashMap;
 pub fn test() {
     let namer = NameGen::new();
     let mut names = HashMap::new();
-    for n in 0..100_000_000 {
+    let mut collision_count = 0;
+    for n in 0..1_000_000 {
+        if n % 100000 == 0 {
+            println!("{} inserts", n);
+        }
         let name = namer.name();
-        let surname = namer.name();
-        println!("{} {}", name, surname);
+        /* let surname = namer.name();
+        println!("{} {}", name, surname); */
         if let Some(_) = names.insert(name.clone(), 1) {
             println!("Fail after {n} inserts, {} already exists", name);
             names.insert(name.clone(), names.get(&name).unwrap() + 1);
+            collision_count += 1;
         }
     }
+    println!("Test finished with {} collisions", collision_count);
 }
