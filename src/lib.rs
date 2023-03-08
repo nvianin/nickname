@@ -1,9 +1,6 @@
-use core::panic;
 use rand::{thread_rng, Rng};
-use serde::{Deserialize, Serialize};
-use std::fs;
 
-#[derive(Debug, Clone, PartialEq, Serialize)]
+#[derive(Debug, Clone)]
 pub struct NameGen {
     names: Vec<String>,
 }
@@ -61,12 +58,21 @@ pub fn test() {
         }
         let name = namer.name();
         /* let surname = namer.name();
-        println!("{} {}", name, surname); */
+        println!("{name} {surname}"); */
         if let Some(_) = names.insert(name.clone(), 1) {
             println!("Fail after {n} inserts, {} already exists", name);
             names.insert(name.clone(), names.get(&name).unwrap() + 1);
             collision_count += 1;
         }
     }
+    let mut collisions = HashMap::new();
+
+    names.iter().for_each(|(k, v)| {
+        if *v > 1 {
+            collisions.insert(k, v);
+        }
+    });
+
+    println!("{:#?}", collisions);
     println!("Test finished with {} collisions", collision_count);
 }
