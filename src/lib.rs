@@ -1,4 +1,5 @@
 use rand::{thread_rng, Rng};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub struct NameGen {
@@ -44,8 +45,6 @@ impl NameGen {
             .collect()
     }
 }
-
-use std::collections::HashMap;
 
 #[test]
 pub fn test() {
