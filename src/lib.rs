@@ -32,7 +32,7 @@ impl NameGen {
             }
         }
 
-        name += &(String::from("-") + &self.random_chars(3));
+        name += &(String::from("-") + &self.random_chars(5));
 
         name
     }
