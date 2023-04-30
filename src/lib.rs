@@ -1,26 +1,31 @@
 use rand::{thread_rng, Rng};
-use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
-pub struct NameGen {
+/// Nickname is a random name generator
+/// It appends a random number of trailing characters to a random name
+pub struct Nickname {
     names: Vec<String>,
+    trailing_chars: u8,
 }
 
 // Dataset from https://data.world/alexandra/baby-names
 const NAMES: &str = include_str!("./names.txt");
 
-impl NameGen {
-    pub fn new() -> NameGen {
+impl Nickname {
+    pub fn new(trailing_chars: u8) -> Nickname {
         let data = NAMES.replace("\r", "");
         let names: Vec<String> = data.split("\n").map(String::from).collect();
 
-        NameGen { names }
+        Nickname {
+            names,
+            trailing_chars,
+        }
     }
 
     pub fn name(&self) -> String {
         let i = thread_rng().gen_range(0..self.names.len());
-        let mut name: String;
-        match self.names[i].chars().nth(0) {
+        let mut name = self.names[i].clone();
+        /* match self.names[i].chars().nth(0) {
             Some(char) => {
                 if char != '/' {
                     name = self.names[i].clone();
@@ -31,48 +36,99 @@ impl NameGen {
             None => {
                 name = self.name();
             }
-        }
+        } */
 
-        name += &(String::from("-") + &self.random_chars(5));
+        name += &(String::from("-") + &self.random_chars(self.trailing_chars));
 
         name
     }
 
-    fn random_chars(&self, number: usize) -> String {
+    fn random_chars(&self, number: u8) -> String {
         thread_rng()
             .sample_iter(&rand::distributions::Alphanumeric)
-            .take(number)
+            .take(number as usize)
             .map(char::from)
             .collect()
     }
 }
 
-#[test]
-pub fn test() {
-    let namer = NameGen::new();
-    let mut names = HashMap::new();
-    let mut collision_count = 0;
-    for n in 0..1_000_000 {
-        if n % 100000 == 0 {
-            println!("{} inserts", n);
-        }
-        let name = namer.name();
-        /* let surname = namer.name();
-        println!("{name} {surname}"); */
-        if let Some(_) = names.insert(name.clone(), 1) {
-            println!("Fail after {n} inserts, {} already exists", name);
-            names.insert(name.clone(), names.get(&name).unwrap() + 1);
-            collision_count += 1;
-        }
+#[cfg(test)]
+pub mod tests {
+    use super::Nickname;
+    use std::collections::HashMap;
+    use std::thread;
+
+    pub const INSERTS_TO_TRY: usize = 100_000_000;
+    #[test]
+    pub fn median_nickname_collision_test(){
+        let results = Vec<usize>
     }
-    let mut collisions = HashMap::new();
-
-    names.iter().for_each(|(k, v)| {
-        if *v > 1 {
-            collisions.insert(k, v);
+    pub fn nickname_test() -> usize {
+        let mut threads = Vec::new();
+        let available_parallelism = thread::available_parallelism().unwrap().get();
+        for _ in 0..available_parallelism {
+            let thread: thread::JoinHandle<HashMap<String, u32>> = thread::spawn(move || {
+                let namer = Nickname::new(5);
+                let mut names: HashMap<String, u32> = HashMap::new();
+                let mut collision_count = 0;
+                let mut collisions: HashMap<String, u32> = HashMap::new();
+                for n in 0..(INSERTS_TO_TRY / available_parallelism) {
+                    if n % 100000 == 0 {
+                        println!(
+                            "{} inserts out of {}",
+                            n,
+                            INSERTS_TO_TRY / available_parallelism
+                        );
+                    }
+                    let name = namer.name();
+                    /* let surname = namer.name();
+                    println!("{name} {surname}"); */
+                    if let Some(_) = names.insert(name.clone(), 1) {
+                        println!("Fail after {n} inserts, {} already exists", name);
+                        let mut count = names.get(&name).unwrap().clone();
+                        count += 1;
+                        names.insert(name.clone(), count);
+                        collisions.insert(name, count);
+                        collision_count += 1;
+                    }
+                }
+                println!(
+                    "Thread {:?} finished with {} collisions",
+                    thread::current().id(),
+                    collision_count
+                );
+                collisions
+            });
+            threads.push(thread);
         }
-    });
 
-    println!("{:#?}", collisions);
-    println!("Test finished with {} collisions", collision_count);
+        let mut names: HashMap<String, u32> = HashMap::new();
+        let mut finished_threads = 0;
+        for thread in threads {
+            let results = thread.join().unwrap();
+            names.extend(results);
+            finished_threads += 1;
+            println!(
+                "{}/{} threads finished",
+                finished_threads, available_parallelism
+            );
+        }
+
+        println!("Parsing test results...");
+        let mut collisions = HashMap::new();
+        let mut i = 0;
+        names.iter().for_each(|(k, v)| {
+            if i % 100000 == 0 {
+                println!("{}/{}...", i, INSERTS_TO_TRY);
+            }
+            i += 1;
+            if *v > 1 {
+                collisions.insert(k, v);
+            }
+        });
+
+        println!("{:#?}", collisions);
+        println!("Test finished with {} collisions", collisions.len());
+        collisions.len()
+    }
 }
