@@ -6,6 +6,7 @@ pub struct NameGen {
     names: Vec<String>,
 }
 
+// Dataset from https://data.world/alexandra/baby-names
 const NAMES: &str = include_str!("./names.txt");
 
 impl NameGen {
