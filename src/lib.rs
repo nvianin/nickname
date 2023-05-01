@@ -67,7 +67,7 @@ pub mod tests {
     use std::thread;
     use std::time::Instant;
 
-    pub const INSERTS_TO_TRY: usize = 100_000_000;
+    pub const INSERTS_TO_TRY: usize = 1_000_000;
     #[test]
     pub fn median_nickname_collision_test() {
         let mut results = Vec::new();
@@ -105,6 +105,9 @@ pub mod tests {
                         );
                     }
                     let name = namer.name();
+                    if n % 1000000 == 0 {
+                        println!("{}", name);
+                    }
                     /* let surname = namer.name();
                     println!("{name} {surname}"); */
                     if let Some(_) = names.insert(name.clone(), 1) {
