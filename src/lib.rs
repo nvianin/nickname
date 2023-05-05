@@ -2,7 +2,7 @@ use rand::{thread_rng, Rng};
 
 #[derive(Debug, Clone)]
 /// Nickname is a random name generator
-/// It appends a random number of trailing characters to a random name
+/// It appends a specified number of trailing characters to a random name
 pub struct Nickname {
     names: Vec<String>,
     trailing_chars: u8,
